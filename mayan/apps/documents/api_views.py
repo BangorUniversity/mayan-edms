@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -11,6 +12,7 @@ from rest_framework.settings import api_settings
 
 from acls.models import AccessEntry
 from common.models import SharedUploadedFile
+from common.compressed_files import CompressedFile
 from converter.exceptions import UnkownConvertError, UnknownFileFormat
 from converter.literals import (
     DEFAULT_PAGE_NUMBER, DEFAULT_ROTATION, DEFAULT_ZOOM_LEVEL
@@ -38,6 +40,7 @@ from .serializers import (
 from .settings import DISPLAY_SIZE, ZOOM_MAX_LEVEL, ZOOM_MIN_LEVEL
 from .tasks import task_get_document_image, task_new_document
 
+from filetransfers.api import serve_file
 
 class APIDocumentListView(generics.ListAPIView):
     """
@@ -325,3 +328,34 @@ class APIRecentDocumentListView(generics.ListAPIView):
     def get(self, *args, **kwargs):
         """Return a list of the recent documents for the current user."""
         return super(APIRecentDocumentListView, self).get(*args, **kwargs)
+
+
+class APIDocumentDownloadView(generics.RetrieveAPIView):
+    """
+    Returns the selected document using serve_file.
+    """
+
+    serializer_class = DocumentSerializer
+    queryset = Document.objects.all()
+
+    permission_classes = (MayanPermission,)
+    mayan_object_permissions = {
+        'GET': [PERMISSION_DOCUMENT_VIEW],
+    }
+
+    def retrieve(self, *args, **kwargs):
+        """Return the file of the selected document."""
+        compressed_file = CompressedFile()
+        document = self.get_object()
+        descriptor = document.open()
+        compressed_file.add_file(descriptor, arcname=slugify(document.label))
+        descriptor.close()
+        compressed_file.close()
+        return serve_file(
+            self.request,
+            compressed_file.as_file('download.zip'),
+            save_as='"%s"' % 'download.zip',
+            content_type='application/zip'
+        )
+
+

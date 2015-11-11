@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.conf.urls import patterns, url
 
 from .api_views import (
-    APIDocumentView, APIDocumentImageView, APIDocumentListView,
+    APIDocumentView, APIDocumentDownloadView, APIDocumentImageView, APIDocumentListView,
     APIDocumentPageView, APIDocumentTypeDocumentListView,
     APIDocumentTypeListView, APIDocumentTypeView,
     APIDocumentVersionCreateView, APIDocumentVersionView,
@@ -78,6 +78,7 @@ api_urls = patterns('',
     url(r'^documents/$', APIDocumentListView.as_view(), name='document-list'),
     url(r'^documents/recent/$', APIRecentDocumentListView.as_view(), name='document-recent-list'),
     url(r'^documents/(?P<pk>[0-9]+)/$', APIDocumentView.as_view(), name='document-detail'),
+    url(r'^documents/download/(?P<pk>[0-9]+)/$', APIDocumentDownloadView.as_view(), name='document-download'),
     url(r'^document_version/(?P<pk>[0-9]+)/$', APIDocumentVersionView.as_view(), name='documentversion-detail'),
     url(r'^document_page/(?P<pk>[0-9]+)/$', APIDocumentPageView.as_view(), name='documentpage-detail'),
     url(r'^documents/(?P<pk>[0-9]+)/image/$', APIDocumentImageView.as_view(), name='document-image'),
