@@ -345,17 +345,11 @@ class APIDocumentDownloadView(generics.RetrieveAPIView):
 
     def retrieve(self, *args, **kwargs):
         """Return the file of the selected document."""
-        compressed_file = CompressedFile()
         document = self.get_object()
-        descriptor = document.open()
-        compressed_file.add_file(descriptor, arcname=slugify(document.label))
-        descriptor.close()
-        compressed_file.close()
         return serve_file(
             self.request,
-            compressed_file.as_file('download.zip'),
-            save_as='"%s"' % 'download.zip',
-            content_type='application/zip'
+            document.file,
+            save_as=document.label,
+            content_type=document.file_mimetype
         )
-
 

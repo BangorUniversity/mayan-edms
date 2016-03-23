@@ -94,7 +94,8 @@ class Installation(SingletonModel):
         except Exception:
             namespace.add_property('pdftotext', _('pdftotext version'), _('error getting version'), report=True)
         else:
-            namespace.add_property('pdftotext', _('pdftotext version'), pdftotext('-v').stderr, report=True)
+            pass
+            #namespace.add_property('pdftotext', _('pdftotext version'), pdftotext('-v').stderr, report=True)
 
     def mayan_properties(self):
         namespace = PropertyNamespace('mayan', _('Mayan EDMS'))
