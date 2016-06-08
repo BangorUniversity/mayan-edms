@@ -4,7 +4,6 @@ from __future__ import absolute_import, unicode_literals
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from django.utils.text import slugify
 
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -12,7 +11,6 @@ from rest_framework.settings import api_settings
 
 from acls.models import AccessEntry
 from common.models import SharedUploadedFile
-from common.compressed_files import CompressedFile
 from converter.exceptions import UnkownConvertError, UnknownFileFormat
 from converter.literals import (
     DEFAULT_PAGE_NUMBER, DEFAULT_ROTATION, DEFAULT_ZOOM_LEVEL

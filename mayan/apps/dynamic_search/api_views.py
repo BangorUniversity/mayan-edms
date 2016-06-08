@@ -5,9 +5,15 @@ from rest_framework.exceptions import ParseError
 
 from rest_api.filters import MayanObjectPermissionsFilter
 
+from rest_api.permissions import MayanPermission
+
 from .classes import SearchModel
 from .models import RecentSearch
-from .serializers import RecentSearchSerializer, SearchSerializer
+from .serializers import RecentSearchSerializer, SearchSerializer, DocumentIdSerializer
+
+from documents.permissions import PERMISSION_DOCUMENT_VIEW
+
+from documents.models import Document
 
 
 class APIRecentSearchListView(generics.ListAPIView):
@@ -54,3 +60,18 @@ class APISearchView(generics.ListAPIView):
             raise ParseError(unicode(exception))
 
         return queryset
+
+
+class APIGetId(generics.RetrieveAPIView):
+    """
+    Returns the selected document.
+    """
+
+    serializer_class = DocumentIdSerializer
+    lookup_field = 'label'
+    queryset = Document.objects.all()
+
+    permission_classes = (MayanPermission,)
+    mayan_object_permissions = {
+        'GET': [PERMISSION_DOCUMENT_VIEW],
+    }
